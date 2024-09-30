@@ -1,7 +1,3 @@
-# Crie um vetor que leia 
-# valores inteiros , e mostre os 
-# valores armazenados , e 
-# mostre quais são pares
 
 tamanho = int(input("Digite o tamanho do vetor"))
 vetor = []
