@@ -21,7 +21,7 @@ def escolher_imagem():
     imagem_pil = Image.open(caminho_imagem)
     largura, altura = imagem_pil.size
     if largura > 150:
-        proporcao = largura / 350
+        proporcao = largura / 150
         nova_altura = int(altura/proporcao)
         imagem_pil = imagem_pil.resize((110, nova_altura))
 
