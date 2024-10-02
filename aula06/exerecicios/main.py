@@ -63,7 +63,7 @@ class PersonControlApp:
         
         # Adiciona um evento de seleção na tabela
         self.tree.bind('<<TreeviewSelect>>', self.on_tree_select)
-
+    
     def create_label_and_input(self, text, row, column):
         """Helper to create labels with default settings"""
         label = ttk.Label(self.root, text=text)
