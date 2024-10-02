@@ -49,7 +49,7 @@ class PersonControlApp:
         self.weight_entry = self.create_entry(1, 3, width=10)
 
         self.create_label_and_input("Cidade:", 1, 4)
-        self.city_combo = ttk.Combobox(self.root, values=["Registro", "Outra"], width=10)
+        self.city_combo = ttk.Combobox(self.root, values=["Registro","Iguape","Cananeia","Pariquera","Cajati","Outra"], width=10)
         self.city_combo.grid(row=1, column=5, pady=5, padx=10)
 
         self.create_label_and_input("Data Nascimento:", 2, 0)
