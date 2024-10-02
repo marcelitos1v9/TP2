@@ -53,7 +53,8 @@ TP2/
    ```
 
 3. **Interface Principal:**
-   ![Interface Principal](caminho/para/screenshot_interface.png)
+
+
 
 4. **Adicionar Pessoa:**
    - Preencha os campos
@@ -73,11 +74,6 @@ TP2/
    - Digite o nome no campo de busca
    - Clique em "Buscar"
 
-## 📸 Capturas de Tela
-
-| Adicionar Pessoa | Listar Pessoas | Atualizar Pessoa |
-|:----------------:|:--------------:|:----------------:|
-| ![Adicionar](caminho/para/screenshot_adicionar.png) | ![Listar](caminho/para/screenshot_listar.png) | ![Atualizar](caminho/para/screenshot_atualizar.png) |
 
 ## 🤝 Contribuição
 
