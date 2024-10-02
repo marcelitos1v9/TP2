@@ -62,8 +62,8 @@ seu-projeto/
 1. **Clone o Repositório**
 
     ```bash
-    git clone https://github.com/seu-usuario/seu-repositorio.git
-    cd seu-repositorio
+    git clone https://github.com/marcelitos1v9/TP2.git
+    cd TP2
     ```
 
 2. **Crie e Ative um Ambiente Virtual (Opcional, mas Recomendado)**
