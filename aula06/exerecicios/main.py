@@ -4,12 +4,22 @@ from PIL import Image, ImageTk
 import os
 import shutil
 from back import GerenciadorPessoas, converter_para_documento, converter_para_formulario
+import threading
 
 class PersonControlApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Controle de Pessoas")
-        self.root.geometry("900x600")  # Aumentei a largura para acomodar a imagem
+        self.root.geometry("950x650")  # Aumentei a largura para acomodar mais elementos
+
+        # Configuração do tema
+        self.style = ttk.Style()
+        self.style.theme_use("clam")
+        self.style.configure("TButton", padding=6, relief="flat", background="#ccc")
+        self.style.configure("TEntry", padding=5)
+        self.style.configure("TLabel", padding=5)
+        self.style.configure("Treeview", rowheight=25)
+        self.style.map("TButton", background=[("active", "#ddd")])
 
         # Inicializa o gerenciador de pessoas
         self.gerenciador = GerenciadorPessoas()
@@ -25,29 +35,29 @@ class PersonControlApp:
         self.create_label_and_input("ID:", 0, 0)
         self.id_entry = self.create_entry(0, 1, width=20)
         self.id_entry.config(state='readonly')  # Torna o campo ID somente leitura
-        
+
         self.create_label_and_input("Nome:", 0, 2)
         self.name_entry = self.create_entry(0, 3, width=20)
-        
+
         self.create_label_and_input("Idade:", 0, 5)
         self.age_entry = self.create_entry(0, 6, width=5)
-        
+
         self.create_label_and_input("Altura:", 1, 0)
         self.height_entry = self.create_entry(1, 1, width=10)
-        
+
         self.create_label_and_input("Peso:", 1, 2)
         self.weight_entry = self.create_entry(1, 3, width=10)
-        
+
         self.create_label_and_input("Cidade:", 1, 4)
         self.city_combo = ttk.Combobox(self.root, values=["Registro", "Outra"], width=10)
         self.city_combo.grid(row=1, column=5, pady=5, padx=10)
 
         self.create_label_and_input("Data Nascimento:", 2, 0)
         self.birth_entry = self.create_entry(2, 1, width=12)
-        
+
         self.create_label_and_input("Data Cadastro:", 2, 2)
         self.registration_entry = self.create_entry(2, 3, width=12)
-        
+
         self.create_label_and_input("Data Atualização:", 2, 4)
         self.update_entry = self.create_entry(2, 5, width=12)
 
@@ -57,13 +67,19 @@ class PersonControlApp:
 
         # Create Buttons
         self.create_buttons()
-        
+
         # Criar tabela
         self.create_table()
-        
+
         # Adiciona um evento de seleção na tabela
         self.tree.bind('<<TreeviewSelect>>', self.on_tree_select)
-    
+
+        # Campo de busca
+        self.create_search_field()
+
+        # Carrega os dados inicialmente
+        self.consult_data()
+
     def create_label_and_input(self, text, row, column):
         """Helper to create labels with default settings"""
         label = ttk.Label(self.root, text=text)
@@ -76,14 +92,14 @@ class PersonControlApp:
         return entry
 
     def create_buttons(self):
-        """Create action buttons: Save, Delete, Update, Consult"""
+        """Create action buttons: Save, Delete, Update, Consult, Escolher Imagem"""
         button_texts = ["Salvar", "Excluir", "Alterar", "Consultar", "Escolher Imagem"]
-        button_commands = [self.save_data, self.delete_data, self.update_data, self.consult_data, self.select_image]
+        button_commands = [self.save_data_thread, self.delete_data_thread, self.update_data_thread, self.consult_data_thread, self.select_image]
 
         for i, (text, command) in enumerate(zip(button_texts, button_commands)):
             button = ttk.Button(self.root, text=text, command=command)
             button.grid(row=5, column=i, pady=15, padx=5)
-        
+
         # Exit button
         exit_button = ttk.Button(self.root, text="Sair", command=self.root.quit)
         exit_button.grid(row=6, column=4, pady=10)
@@ -96,7 +112,7 @@ class PersonControlApp:
         # Define cabeçalhos para as colunas
         for col in columns:
             self.tree.heading(col, text=col)
-            self.tree.column(col, width=100)
+            self.tree.column(col, width=150)
 
         self.tree.grid(row=7, column=0, columnspan=6, padx=10, pady=10, sticky='nsew')
 
@@ -104,6 +120,44 @@ class PersonControlApp:
         scrollbar = ttk.Scrollbar(self.root, orient=tk.VERTICAL, command=self.tree.yview)
         self.tree.configure(yscroll=scrollbar.set)
         scrollbar.grid(row=7, column=6, sticky='ns')
+
+        # Configura redimensionamento da tabela
+        self.root.grid_rowconfigure(7, weight=1)
+        self.root.grid_columnconfigure(5, weight=1)
+
+    def create_search_field(self):
+        """Cria campo de busca para filtrar pessoas por nome"""
+        search_label = ttk.Label(self.root, text="Buscar por Nome:")
+        search_label.grid(row=4, column=0, pady=5, padx=10, sticky=tk.E)
+
+        self.search_entry = ttk.Entry(self.root, width=20)
+        self.search_entry.grid(row=4, column=1, pady=5, padx=10, sticky=tk.W)
+
+        search_button = ttk.Button(self.root, text="Buscar", command=self.search_data_thread)
+        search_button.grid(row=4, column=2, pady=5, padx=5)
+
+        reset_button = ttk.Button(self.root, text="Resetar Busca", command=self.consult_data_thread)
+        reset_button.grid(row=4, column=3, pady=5, padx=5)
+
+    def save_data_thread(self):
+        """Inicia a thread para salvar dados"""
+        threading.Thread(target=self.save_data).start()
+
+    def delete_data_thread(self):
+        """Inicia a thread para deletar dados"""
+        threading.Thread(target=self.delete_data).start()
+
+    def update_data_thread(self):
+        """Inicia a thread para atualizar dados"""
+        threading.Thread(target=self.update_data).start()
+
+    def consult_data_thread(self):
+        """Inicia a thread para consultar dados"""
+        threading.Thread(target=self.consult_data).start()
+
+    def search_data_thread(self):
+        """Inicia a thread para buscar dados"""
+        threading.Thread(target=self.search_data).start()
 
     def select_image(self):
         """Abre o diálogo para selecionar uma imagem e exibe"""
@@ -142,11 +196,12 @@ class PersonControlApp:
 
     def save_data(self):
         """Salva os dados no banco de dados"""
+        self.toggle_buttons_state('disabled')
         dados = self.get_form_data()
         try:
             documento = converter_para_documento(dados)
             pessoa_id = self.gerenciador.inserir_pessoa(documento)
-            
+
             # Salva a imagem no diretório de perfil
             if self.imagem_path:
                 ext = os.path.splitext(self.imagem_path)[1]
@@ -159,47 +214,70 @@ class PersonControlApp:
             self.id_entry.insert(0, pessoa_id)
             self.id_entry.config(state='readonly')
             messagebox.showinfo("Salvar", f"Dados salvos com sucesso! ID: {pessoa_id}")
-            self.consult_data()  # Atualiza a tabela após salvar
+            self.consult_data()
         except ValueError as e:
             messagebox.showerror("Erro", f"Erro ao salvar dados: {str(e)}")
         except Exception as e:
             messagebox.showerror("Erro", f"Erro inesperado ao salvar dados: {str(e)}")
-        
+        finally:
+            self.toggle_buttons_state('normal')
+
     def delete_data(self):
         """Exclui os dados do banco de dados"""
+        self.toggle_buttons_state('disabled')
         pessoa_id = self.id_entry.get()
         if not pessoa_id:
             messagebox.showerror("Erro", "Por favor, selecione um registro para excluir.")
+            self.toggle_buttons_state('normal')
             return
         try:
             if self.gerenciador.excluir_pessoa(pessoa_id):
+                # Remove a imagem associada
+                imagem_path = os.path.join(self.perfil_dir, f"{pessoa_id}.png")  # Assumindo extensão .png
+                if os.path.exists(imagem_path):
+                    os.remove(imagem_path)
+
                 messagebox.showinfo("Excluir", "Dados excluídos com sucesso!")
                 self.clear_form()
-                self.consult_data()  # Atualiza a tabela após excluir
+                self.consult_data()
             else:
                 messagebox.showinfo("Excluir", "Nenhum registro encontrado para excluir.")
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao excluir dados: {e}")
-        
+        finally:
+            self.toggle_buttons_state('normal')
+
     def update_data(self):
         """Atualiza os dados no banco de dados"""
+        self.toggle_buttons_state('disabled')
         pessoa_id = self.id_entry.get()
         if not pessoa_id:
             messagebox.showerror("Erro", "Por favor, selecione um registro para atualizar.")
+            self.toggle_buttons_state('normal')
             return
         dados = self.get_form_data()
         documento = converter_para_documento(dados)
         try:
             if self.gerenciador.atualizar_pessoa(pessoa_id, documento):
+                # Atualiza a imagem se houver nova
+                if self.imagem_path:
+                    ext = os.path.splitext(self.imagem_path)[1]
+                    new_image_path = os.path.join(self.perfil_dir, f"{pessoa_id}{ext}")
+                    shutil.copy(self.imagem_path, new_image_path)
+                    self.gerenciador.atualizar_imagem_pessoa(pessoa_id, new_image_path)
+
                 messagebox.showinfo("Alterar", "Dados atualizados com sucesso!")
-                self.consult_data()  # Atualiza a tabela após atualizar
+                self.consult_data()
             else:
                 messagebox.showinfo("Alterar", "Nenhum registro encontrado para atualizar.")
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao atualizar dados: {e}")
-        
+        finally:
+            self.toggle_buttons_state('normal')
+
     def consult_data(self):
         """Consulta os dados no banco de dados e exibe na tabela"""
+        self.toggle_buttons_state('disabled')
         try:
             pessoas = self.gerenciador.listar_pessoas()
             self.tree.delete(*self.tree.get_children())  # Limpa a tabela
@@ -212,6 +290,27 @@ class PersonControlApp:
                 ))
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao consultar dados: {str(e)}")
+        finally:
+            self.toggle_buttons_state('normal')
+
+    def search_data(self):
+        """Busca os dados no banco de dados pelo nome e exibe na tabela"""
+        self.toggle_buttons_state('disabled')
+        nome_busca = self.search_entry.get().strip()
+        try:
+            pessoas = self.gerenciador.buscar_pessoas_por_nome(nome_busca)
+            self.tree.delete(*self.tree.get_children())  # Limpa a tabela
+            for pessoa in pessoas:
+                self.tree.insert('', 'end', values=(
+                    pessoa['_id'],
+                    pessoa['nome'],
+                    pessoa['idade'] if pessoa['idade'] is not None else '',
+                    pessoa['cidade']
+                ))
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao buscar dados: {str(e)}")
+        finally:
+            self.toggle_buttons_state('normal')
 
     def on_tree_select(self, event):
         """Preenche o formulário quando um item é selecionado na tabela"""
@@ -232,6 +331,7 @@ class PersonControlApp:
                       self.update_entry, self.desc_entry]:
             entry.delete(0, tk.END)
         self.city_combo.set('')
+        self.search_entry.delete(0, tk.END)
 
         # Limpa a imagem
         if hasattr(self, 'image_label'):
@@ -271,6 +371,12 @@ class PersonControlApp:
             if hasattr(self, 'image_label'):
                 self.image_label.configure(image='')
             self.imagem_path = None
+
+    def toggle_buttons_state(self, state):
+        """Habilita ou desabilita os botões para evitar múltiplas ações simultâneas"""
+        for child in self.root.winfo_children():
+            if isinstance(child, ttk.Button):
+                child.config(state=state)
 
 if __name__ == "__main__":
     root = tk.Tk()

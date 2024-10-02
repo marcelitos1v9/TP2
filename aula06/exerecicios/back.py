@@ -119,3 +119,12 @@ class GerenciadorPessoas:
 
     def atualizar_imagem_pessoa(self, pessoa_id, imagem_path):
         self.db.atualizar_imagem_pessoa(pessoa_id, imagem_path)
+
+    def buscar_pessoas_por_nome(self, nome):
+        """Busca pessoas cujo nome contém o termo de busca"""
+        try:
+            regex = {'$regex': nome, '$options': 'i'}
+            pessoas = self.db.collection.find({'nome': regex})
+            return [converter_para_formulario(pessoa) for pessoa in pessoas]
+        except Exception as e:
+            raise Exception(f"Erro ao buscar pessoas por nome: {str(e)}")
