@@ -39,8 +39,12 @@ class PersonControlApp:
         self.create_label_and_input("Nome:", 0, 2)
         self.name_entry = self.create_entry(0, 3, width=20)
 
-        self.create_label_and_input("Idade:", 0, 5)
-        self.age_entry = self.create_entry(0, 6, width=5)
+        self.create_label_and_input("Idade:", 0, 4)
+        self.age_entry = self.create_entry(0, 5, width=5)
+
+        self.create_label_and_input("Cidade:", 0, 6)
+        self.city_combo = ttk.Combobox(self.root, values=["Registro","Iguape","Cananeia","Pariquera","Cajati","Outra"], width=10)
+        self.city_combo.grid(row=0, column=7, pady=5, padx=10)
 
         self.create_label_and_input("Altura:", 1, 0)
         self.height_entry = self.create_entry(1, 1, width=10)
@@ -48,9 +52,20 @@ class PersonControlApp:
         self.create_label_and_input("Peso:", 1, 2)
         self.weight_entry = self.create_entry(1, 3, width=10)
 
-        self.create_label_and_input("Cidade:", 1, 4)
-        self.city_combo = ttk.Combobox(self.root, values=["Registro","Iguape","Cananeia","Pariquera","Cajati","Outra"], width=10)
-        self.city_combo.grid(row=1, column=5, pady=5, padx=10)
+        # Adicionar campo de gênero
+        self.create_label_and_input("Gênero:", 1, 4)
+        self.gender_var = tk.StringVar(value="Masculino")
+        self.gender_frame = ttk.Frame(self.root)
+        self.gender_frame.grid(row=1, column=5, columnspan=2, pady=5, padx=10, sticky=tk.W)
+        self.gender_male = ttk.Radiobutton(self.gender_frame, text="Masculino", variable=self.gender_var, value="Masculino", state='disabled')
+        self.gender_male.pack(side=tk.LEFT)
+        self.gender_female = ttk.Radiobutton(self.gender_frame, text="Feminino", variable=self.gender_var, value="Feminino", state='disabled')
+        self.gender_female.pack(side=tk.LEFT)
+
+        # Adicionar checkbox para habilitar/desabilitar o campo de gênero
+        self.gender_enabled = tk.BooleanVar(value=False)
+        self.gender_checkbox = ttk.Checkbutton(self.gender_frame, text="Editar", variable=self.gender_enabled, command=self.toggle_gender_field)
+        self.gender_checkbox.pack(side=tk.LEFT)
 
         self.create_label_and_input("Data Nascimento:", 2, 0)
         self.birth_entry = self.create_entry(2, 1, width=12)
@@ -106,7 +121,7 @@ class PersonControlApp:
 
     def create_table(self):
         """Cria a tabela para exibir os clientes"""
-        columns = ('ID', 'Nome', 'Idade', 'Cidade')
+        columns = ('ID', 'Nome', 'Idade', 'Cidade', 'Gênero')  # Adicionado 'Gênero'
         self.tree = ttk.Treeview(self.root, columns=columns, show='headings')
 
         # Define cabeçalhos para as colunas
@@ -183,7 +198,7 @@ class PersonControlApp:
 
     def get_form_data(self):
         """Coleta os dados do formulário"""
-        return {
+        dados = {
             'nome': self.name_entry.get(),
             'idade': self.age_entry.get(),
             'altura': self.height_entry.get(),
@@ -193,6 +208,9 @@ class PersonControlApp:
             'descricao': self.desc_entry.get(),
             'imagem_path': self.imagem_path
         }
+        if self.gender_enabled.get():
+            dados['genero'] = self.gender_var.get()
+        return dados
 
     def save_data(self):
         """Salva os dados no banco de dados"""
@@ -286,7 +304,8 @@ class PersonControlApp:
                     pessoa['_id'],
                     pessoa['nome'],
                     pessoa['idade'] if pessoa['idade'] is not None else '',
-                    pessoa['cidade']
+                    pessoa['cidade'],
+                    pessoa['genero']  # Adicionado gênero
                 ))
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao consultar dados: {str(e)}")
@@ -305,7 +324,8 @@ class PersonControlApp:
                     pessoa['_id'],
                     pessoa['nome'],
                     pessoa['idade'] if pessoa['idade'] is not None else '',
-                    pessoa['cidade']
+                    pessoa['cidade'],
+                    pessoa['genero']  # Adicionado gênero
                 ))
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao buscar dados: {str(e)}")
@@ -338,6 +358,10 @@ class PersonControlApp:
             self.image_label.configure(image='')
         self.imagem_path = None
 
+        self.gender_var.set('Masculino')
+        self.gender_enabled.set(False)
+        self.toggle_gender_field()
+
     def preencher_formulario(self, dados):
         """Preenche o formulário com os dados consultados"""
         self.id_entry.config(state='normal')
@@ -361,6 +385,9 @@ class PersonControlApp:
         self.update_entry.insert(0, dados['data_atualizacao'])
         self.desc_entry.delete(0, tk.END)
         self.desc_entry.insert(0, dados['descricao'])
+        self.gender_var.set(dados.get('genero', 'Masculino'))
+        self.gender_enabled.set(False)
+        self.toggle_gender_field()
 
         # Carrega a imagem se existir
         if 'imagem_path' in dados and dados['imagem_path']:
@@ -377,6 +404,12 @@ class PersonControlApp:
         for child in self.root.winfo_children():
             if isinstance(child, ttk.Button):
                 child.config(state=state)
+
+    def toggle_gender_field(self):
+        """Habilita ou desabilita o campo de gênero"""
+        state = 'normal' if self.gender_enabled.get() else 'disabled'
+        self.gender_male.config(state=state)
+        self.gender_female.config(state=state)
 
 if __name__ == "__main__":
     root = tk.Tk()

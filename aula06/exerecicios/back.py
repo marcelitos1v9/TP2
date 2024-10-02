@@ -64,6 +64,8 @@ def converter_para_documento(dados):
             'data_nascimento': datetime.strptime(dados['data_nascimento'], '%d/%m/%Y') if dados['data_nascimento'] else None,
             'descricao': dados['descricao']
         }
+        if 'genero' in dados:
+            documento['genero'] = dados['genero']
         if 'imagem_path' in dados and dados['imagem_path']:
             documento['imagem_path'] = dados['imagem_path']
         return documento
@@ -79,10 +81,11 @@ def converter_para_formulario(documento):
         'altura': str(documento['altura']) if documento['altura'] is not None else '',
         'peso': str(documento['peso']) if documento['peso'] is not None else '',
         'cidade': documento['cidade'],
-        'data_nascimento': documento['data_nascimento'].strftime('%d/%m/%Y') if documento['data_nascimento'] else '',
+        'genero': documento.get('genero', 'Masculino'),  # Valor padrão se não existir
+        'data_nascimento': documento['data_nascimento'].strftime('%d/%m/%Y') if documento.get('data_nascimento') else '',
         'data_cadastro': documento['data_cadastro'].strftime('%d/%m/%Y'),
         'data_atualizacao': documento['data_atualizacao'].strftime('%d/%m/%Y'),
-        'descricao': documento['descricao']
+        'descricao': documento.get('descricao', '')
     }
     if 'imagem_path' in documento:
         formulario['imagem_path'] = documento['imagem_path']
@@ -102,6 +105,9 @@ class GerenciadorPessoas:
         pessoa = self.db.consultar_pessoa(pessoa_id)
         if pessoa:
             dados['_id'] = pessoa['_id']
+            # Manter o gênero existente se não for fornecido um novo
+            if 'genero' not in dados:
+                dados['genero'] = pessoa.get('genero', 'Masculino')
             self.db.salvar_pessoa(dados)
             return True
         return False
