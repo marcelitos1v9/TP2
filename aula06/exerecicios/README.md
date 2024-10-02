@@ -1,137 +1,100 @@
-# Controle de Pessoas
+# Controle de Pessoas 👥
 
-## Descrição
+![Logo do Projeto](icones/logo_usuarios.png)
 
-O **Controle de Pessoas** é uma aplicação de desktop desenvolvida em Python que permite gerenciar informações de indivíduos de forma eficiente. Utilizando uma interface gráfica amigável criada com Tkinter, a aplicação fornece funcionalidades completas de CRUD (Criar, Ler, Atualizar, Excluir) para adicionar, consultar, atualizar e remover registros de pessoas. Os dados são armazenados em um banco de dados MongoDB, garantindo persistência e facilidade de acesso. Além disso, a aplicação suporta o upload de imagens de perfil para cada pessoa cadastrada.
+## 📝 Descrição
 
-## Funcionalidades
+O **Controle de Pessoas** é uma aplicação desktop em Python para gerenciar informações de indivíduos de forma eficiente. Com uma interface gráfica amigável, oferece funcionalidades CRUD completas e suporte para upload de imagens de perfil.
 
-- **Adicionar Pessoa**: Insira informações detalhadas como nome, idade, altura, peso, cidade, datas de nascimento, cadastro e atualização, descrição e uma imagem de perfil.
-- **Consultar Pessoa**: Busque registros específicos utilizando o ID único de cada pessoa.
-- **Atualizar Pessoa**: Modifique informações existentes de qualquer registro.
-- **Excluir Pessoa**: Remova registros conforme necessário.
-- **Upload de Imagem**: Associe uma imagem de perfil a cada registro de pessoa.
-- **Interface Intuitiva**: Navegue facilmente através de uma interface gráfica construída com Tkinter.
-- **Listagem de Pessoas**: Visualize todos os registros em uma tabela interativa com funcionalidades de busca.
+## ✨ Funcionalidades
 
-## Tecnologias Utilizadas
+| Funcionalidade | Descrição | Ícone |
+|----------------|-----------|-------|
+| Adicionar Pessoa | Insira informações detalhadas de uma nova pessoa | ![Adicionar](icones/acesso.png) |
+| Consultar Pessoa | Busque registros específicos por ID | ![Consultar](icones/consultar.png) |
+| Atualizar Pessoa | Modifique informações de registros existentes | ![Atualizar](icones/alterar.png) |
+| Excluir Pessoa | Remova registros do banco de dados | ![Excluir](icones/excluir.png) |
+| Upload de Imagem | Associe uma imagem de perfil a cada registro | 🖼️ |
+| Listagem de Pessoas | Visualize todos os registros em uma tabela interativa | 📋 |
+| Busca por Nome | Filtre pessoas pelo nome | 🔍 |
 
-- **Python 3.12**: Linguagem de programação principal.
-- **Tkinter**: Biblioteca para desenvolvimento da interface gráfica.
-- **MongoDB**: Banco de dados NoSQL para armazenamento de informações.
-- **PyMongo**: Biblioteca Python para interação com o MongoDB.
-- **Pillow (PIL)**: Biblioteca para manipulação e exibição de imagens.
-- **Shutil**: Módulo Python para operações de alto nível em arquivos e coleções de arquivos.
+## 🛠️ Tecnologias Utilizadas
 
-## Estrutura do Projeto
+- **Python 3.12**
+- **Tkinter** (Interface Gráfica)
+- **MongoDB** (Banco de Dados)
+- **PyMongo** (Conexão com MongoDB)
+- **Pillow (PIL)** (Manipulação de Imagens)
+
+## 🗂️ Estrutura do Projeto
 
 ```
-seu-projeto/
+TP2/
 ├── aula06/
 │   ├── exercicios/
-│   │   ├── __pycache__/
 │   │   ├── icones/
-│   │   │   ├── acesso.png
-│   │   │   ├── alterar.png
-│   │   │   ├── consultar.png
-│   │   │   ├── excluir.png
-│   │   │   ├── icone.ico
-│   │   │   ├── logo_servicos.png
-│   │   │   ├── logo_usuarios.png
-│   │   │   ├── logout.png
-│   │   │   ├── sair.png
-│   │   │   └── salvar.png
 │   │   ├── back.py
 │   │   └── main.py
 │   └── perfil/
-│       └── [Imagens de Perfil]
-├── .git/
 ├── README.md
 └── requirements.txt
 ```
 
-## Instalação
+## 🚀 Como Usar
 
-### Pré-requisitos
+1. **Instale as Dependências:**
+   ```
+   pip install -r requirements.txt
+   ```
 
-- **Python 3.12**: [Download Python](https://www.python.org/downloads/)
-- **MongoDB**: [Download MongoDB Community Server](https://www.mongodb.com/try/download/community)
+2. **Execute a Aplicação:**
+   ```
+   python main.py
+   ```
 
-### Passos de Instalação
+3. **Interface Principal:**
+   ![Interface Principal](caminho/para/screenshot_interface.png)
 
-1. **Clone o Repositório**
+4. **Adicionar Pessoa:**
+   - Preencha os campos
+   - Clique em "Adicionar"
 
-    ```bash
-    git clone https://github.com/marcelitos1v9/TP2.git
-    cd TP2
-    ```
+5. **Consultar/Atualizar Pessoa:**
+   - Digite o ID
+   - Clique em "Consultar"
+   - Modifique os campos desejados
+   - Clique em "Atualizar"
 
-2. **Crie e Ative um Ambiente Virtual (Opcional, mas Recomendado)**
+6. **Excluir Pessoa:**
+   - Selecione a pessoa na tabela
+   - Clique em "Excluir"
 
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # No Windows: venv\Scripts\activate
-    ```
+7. **Buscar por Nome:**
+   - Digite o nome no campo de busca
+   - Clique em "Buscar"
 
-3. **Instale as Dependências**
+## 📸 Capturas de Tela
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+| Adicionar Pessoa | Listar Pessoas | Atualizar Pessoa |
+|:----------------:|:--------------:|:----------------:|
+| ![Adicionar](caminho/para/screenshot_adicionar.png) | ![Listar](caminho/para/screenshot_listar.png) | ![Atualizar](caminho/para/screenshot_atualizar.png) |
 
-4. **Configure o MongoDB**
+## 🤝 Contribuição
 
-    - Certifique-se de que o serviço do MongoDB está rodando.
-    - A aplicação está configurada para conectar ao MongoDB na URI `mongodb://localhost:27017/`. Se necessário, ajuste a URI no arquivo `back.py`.
+Contribuições são bem-vindas! Siga estes passos:
 
-## Uso
+1. Faça um Fork do projeto
+2. Crie uma Branch para sua Feature (`git checkout -b feature/AmazingFeature`)
+3. Faça o Commit de suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Faça o Push para a Branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
 
-1. **Inicie a Aplicação**
+## 📄 Licença
 
-    ```bash
-    python main.py
-    ```
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-2. **Interface do Usuário**
+## 📞 Contato
 
-    - **Adicionar Pessoa**: Preencha os campos com as informações da pessoa e clique em "Salvar".
-    - **Consultar Pessoa**: Insira o ID da pessoa e clique em "Consultar" para visualizar os detalhes.
-    - **Atualizar Pessoa**: Após consultar uma pessoa, edite as informações desejadas e clique em "Alterar".
-    - **Excluir Pessoa**: Selecione uma pessoa da tabela e clique em "Excluir" para remover o registro.
-    - **Escolher Imagem**: Clique em "Escolher Imagem" para adicionar ou alterar a imagem de perfil da pessoa.
+Marcelo Augusto - marceloaugustocge@gmail.com
 
-## Contribuição
-
-Contribuições são bem-vindas! Siga os passos abaixo para contribuir:
-
-1. **Fork este Repositório**
-2. **Crie uma Branch para sua Feature**
-
-    ```bash
-    git checkout -b feature/nova-feature
-    ```
-
-3. **Commit suas Alterações**
-
-    ```bash
-    git commit -m 'Adiciona nova funcionalidade'
-    ```
-
-4. **Push para a Branch**
-
-    ```bash
-    git push origin feature/nova-feature
-    ```
-
-5. **Abra um Pull Request**
-
-## Licença
-
-Este projeto está licenciado sob a Licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
-## Contato
-
-- **Autor**: Marcelo Augusto
-- **Email**: Marceloaugustocge@gmail.com
-- **GitHub**: [Marcelo](https://github.com/marcelitos1v9)
-
+Link do Projeto: [https://github.com/marcelitos1v9/TP2](https://github.com/marcelitos1v9/TP2)

@@ -10,7 +10,7 @@ class PersonControlApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Controle de Pessoas")
-        self.root.geometry("950x650")  # Aumentei a largura para acomodar mais elementos
+        self.root.geometry("1200x650")  # Aumentei a largura para acomodar mais elementos
 
         # Configuração do tema
         self.style = ttk.Style()
@@ -30,6 +30,9 @@ class PersonControlApp:
             os.makedirs(self.perfil_dir)
 
         self.imagem_path = None  # Armazena o caminho da imagem selecionada
+
+        # Carregue os ícones
+        self.load_icons()
 
         # Define Labels and Inputs
         self.create_label_and_input("ID:", 0, 0)
@@ -80,6 +83,10 @@ class PersonControlApp:
         self.create_label_and_input("Descrição:", 3, 0)
         self.desc_entry = self.create_entry(3, 1, width=40, colspan=4)
 
+        # Botão para selecionar imagem
+        self.select_image_button = ttk.Button(self.root, text="Selecionar Imagem", command=self.select_image)
+        self.select_image_button.grid(row=3, column=5, pady=5, padx=10)
+
         # Create Buttons
         self.create_buttons()
 
@@ -95,6 +102,9 @@ class PersonControlApp:
         # Carrega os dados inicialmente
         self.consult_data()
 
+        # Carregar imagens
+        self.load_images()
+
     def create_label_and_input(self, text, row, column):
         """Helper to create labels with default settings"""
         label = ttk.Label(self.root, text=text)
@@ -107,17 +117,53 @@ class PersonControlApp:
         return entry
 
     def create_buttons(self):
-        """Create action buttons: Save, Delete, Update, Consult, Escolher Imagem"""
-        button_texts = ["Salvar", "Excluir", "Alterar", "Consultar", "Escolher Imagem"]
-        button_commands = [self.save_data_thread, self.delete_data_thread, self.update_data_thread, self.consult_data_thread, self.select_image]
+        """Cria os botões da interface"""
+        button_frame = ttk.Frame(self.root)
+        button_frame.grid(row=4, column=0, columnspan=8, pady=10)
 
-        for i, (text, command) in enumerate(zip(button_texts, button_commands)):
-            button = ttk.Button(self.root, text=text, command=command)
-            button.grid(row=5, column=i, pady=15, padx=5)
+        ttk.Button(
+            button_frame, 
+            text="Adicionar", 
+            image=self.add_icon, 
+            compound=tk.LEFT, 
+            command=self.save_data
+        ).grid(row=0, column=0, padx=5)
+        
+        ttk.Button(
+            button_frame, 
+            text="Buscar", 
+            image=self.consultar_icon,  # Corrigido para usar o ícone de consulta
+            compound=tk.LEFT, 
+            command=self.search_data
+        ).grid(row=0, column=1, padx=5)
+        
+        ttk.Button(
+            button_frame, 
+            text="Atualizar", 
+            image=self.update_icon, 
+            compound=tk.LEFT, 
+            command=self.update_data
+        ).grid(row=0, column=2, padx=5)
+        
+        ttk.Button(
+            button_frame, 
+            text="Excluir", 
+            image=self.delete_icon, 
+            compound=tk.LEFT, 
+            command=self.delete_data
+        ).grid(row=0, column=3, padx=5)
+        
+        ttk.Button(
+            button_frame, 
+            text="Limpar", 
+            image=self.clear_icon, 
+            compound=tk.LEFT, 
+            command=self.clear_form
+        ).grid(row=0, column=4, padx=5)
 
         # Exit button
         exit_button = ttk.Button(self.root, text="Sair", command=self.root.quit)
-        exit_button.grid(row=6, column=4, pady=10)
+        exit_button.grid(row=6, column=7, pady=10, padx=10, sticky=tk.E)
 
     def create_table(self):
         """Cria a tabela para exibir os clientes"""
@@ -129,30 +175,33 @@ class PersonControlApp:
             self.tree.heading(col, text=col)
             self.tree.column(col, width=150)
 
-        self.tree.grid(row=7, column=0, columnspan=6, padx=10, pady=10, sticky='nsew')
+        self.tree.grid(row=7, column=0, columnspan=8, padx=10, pady=10, sticky='nsew')
 
         # Adiciona scrollbar
         scrollbar = ttk.Scrollbar(self.root, orient=tk.VERTICAL, command=self.tree.yview)
         self.tree.configure(yscroll=scrollbar.set)
-        scrollbar.grid(row=7, column=6, sticky='ns')
+        scrollbar.grid(row=7, column=8, sticky='ns')
 
         # Configura redimensionamento da tabela
         self.root.grid_rowconfigure(7, weight=1)
-        self.root.grid_columnconfigure(5, weight=1)
+        self.root.grid_columnconfigure(7, weight=1)
 
     def create_search_field(self):
         """Cria campo de busca para filtrar pessoas por nome"""
-        search_label = ttk.Label(self.root, text="Buscar por Nome:")
-        search_label.grid(row=4, column=0, pady=5, padx=10, sticky=tk.E)
+        search_frame = ttk.Frame(self.root)
+        search_frame.grid(row=5, column=0, columnspan=8, pady=10)
 
-        self.search_entry = ttk.Entry(self.root, width=20)
-        self.search_entry.grid(row=4, column=1, pady=5, padx=10, sticky=tk.W)
+        search_label = ttk.Label(search_frame, text="Buscar por Nome:")
+        search_label.grid(row=0, column=0, padx=5)
 
-        search_button = ttk.Button(self.root, text="Buscar", command=self.search_data_thread)
-        search_button.grid(row=4, column=2, pady=5, padx=5)
+        self.search_entry = ttk.Entry(search_frame, width=20)
+        self.search_entry.grid(row=0, column=1, padx=5)
 
-        reset_button = ttk.Button(self.root, text="Resetar Busca", command=self.consult_data_thread)
-        reset_button.grid(row=4, column=3, pady=5, padx=5)
+        search_button = ttk.Button(search_frame, text="Buscar", command=self.search_data_thread)
+        search_button.grid(row=0, column=2, padx=5)
+
+        reset_button = ttk.Button(search_frame, text="Resetar Busca", command=self.consult_data_thread)
+        reset_button.grid(row=0, column=3, padx=5)
 
     def save_data_thread(self):
         """Inicia a thread para salvar dados"""
@@ -281,6 +330,8 @@ class PersonControlApp:
                 if self.imagem_path:
                     ext = os.path.splitext(self.imagem_path)[1]
                     new_image_path = os.path.join(self.perfil_dir, f"{pessoa_id}{ext}")
+                    if os.path.exists(new_image_path):
+                        os.remove(new_image_path)  # Remove a imagem antiga
                     shutil.copy(self.imagem_path, new_image_path)
                     self.gerenciador.atualizar_imagem_pessoa(pessoa_id, new_image_path)
 
@@ -410,6 +461,36 @@ class PersonControlApp:
         state = 'normal' if self.gender_enabled.get() else 'disabled'
         self.gender_male.config(state=state)
         self.gender_female.config(state=state)
+
+    def load_icons(self):
+        """Carrega os ícones para os botões"""
+        icon_size = (20, 20)
+        icons_dir = os.path.join(os.path.dirname(__file__), 'icones')
+
+        self.add_icon = self.load_and_resize_image(os.path.join(icons_dir, 'acesso.png'), icon_size)
+        self.search_icon = self.load_and_resize_image(os.path.join(icons_dir, 'logo_usuarios.png'), icon_size)
+        self.update_icon = self.load_and_resize_image(os.path.join(icons_dir, 'alterar.png'), icon_size)
+        self.delete_icon = self.load_and_resize_image(os.path.join(icons_dir, 'excluir.png'), icon_size)
+        self.clear_icon = self.load_and_resize_image(os.path.join(icons_dir, 'limpar.png'), icon_size)
+        self.consultar_icon = self.load_and_resize_image(os.path.join(icons_dir, 'consultar.png'), icon_size)
+
+    def load_and_resize_image(self, path, size):
+        """Carrega e redimensiona uma imagem"""
+        try:
+            img = Image.open(path)
+            img = img.resize(size, Image.LANCZOS)
+            return ImageTk.PhotoImage(img)
+        except Exception as e:
+            print(f"Erro ao carregar a imagem {path}: {e}")
+            return None
+
+    def add_data(self):
+        # Implementação do método adicionar dados
+        pass
+
+    def load_images(self):
+        # Implementação do método load_images
+        pass
 
 if __name__ == "__main__":
     root = tk.Tk()
